@@ -1,6 +1,7 @@
 from pyfr_wrapper import msh2pyfrm
 from pyfr_wrapper import pyfr_run
 from pyfr_wrapper import pyfr_export
+import configparser
 from flask import Flask, render_template, request
 from model import Average
 from werkzeug import secure_filename
@@ -47,6 +48,25 @@ def upload_msh():
             pyfrm = msh2pyfrm(filename)
 
     return render_template("view.html", form=form, pyfrm=pyfrm)
+
+@app.route('/config', methods=['POST'])
+def upload_config():
+    config= configparser.ConfigParser()
+    config.read(r'config/config.ini')
+
+    config['constants'] = {"gamma": request.form.get("gamma"),
+                           "mu":request.form.get("mu"),
+                           "Pr": request.form.get("Pr"),
+                           "cp": request.form.get("cp"),
+                           "Uw": request.form.get("Uw"),
+                           "H": request.form.get("H"),
+                           "Pc": request.form.get("Pc"),
+                           "Tw": request.form.get("Tw")}
+
+    with open(r'config/config.ini', 'w') as configfile:
+        config.write(configfile)
+
+    return render_template("view.html")
 
 @app.route('/run', methods=['POST'])
 def run():

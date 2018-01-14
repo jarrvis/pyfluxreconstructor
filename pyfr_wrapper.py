@@ -12,14 +12,14 @@ def msh2pyfrm(filename=None):
     res_name = os.path.splitext(filename)[0]
     return res_name
 
-# pyfr run -b cuda -p couette_flow_2d.pyfrm couette_flow_2d.ini
-def pyfr_run(mesh_filename=None, config_path="config/couette_flow_2d.ini"):
+# pyfr run -b cuda -p couette_flow_2d.pyfrm config.ini
+def pyfr_run(mesh_filename=None, config_path="config/config.ini"):
     pyfrm = os.path.join('mesh', mesh_filename) + '.pyfrm'
     run_command("pyfr run -b openmp -p " + pyfrm +" " + config_path)
     return
 
 # pyfr export couette_flow_2d.pyfrm couette_flow_2d-040.pyfrs couette_flow_2d-040.vtu -d 4
-def pyfr_export(mesh_filename=None, config_path="config/couette_flow_2d.ini"):
+def pyfr_export(mesh_filename=None, config_path="config/config.ini"):
     pyfrm = os.path.join('mesh', mesh_filename) + '.pyfrm'
     pyfrs = mesh_filename + '-040.pyfrs'
     vtu = mesh_filename + '-040.vtu'

@@ -8,13 +8,13 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Full Width Pics - Start Bootstrap Template</title>
+    <title>Welcome to Flux Reconstructor</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap.min.css') }}">
 
     <!-- Custom styles for this template -->
-    <link href="css/full-width-pics.css" rel="stylesheet">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/full-width-pics.css') }}">
 
   </head>
 
@@ -23,7 +23,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="#">Start Bootstrap</a>
+        <a class="navbar-brand" href="#">Flux Reconstructor</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -49,21 +49,50 @@
     </nav>
 
     <!-- Header - set the background image for the header in the line below -->
-    <header class="py-5 bg-image-full" style="background-image: url('https://unsplash.it/1900/1080?image=1076');">
-      <img class="img-fluid d-block mx-auto" src="http://placehold.it/200x200&text=Logo" alt="">
+    <header class="py-5 bg-image-full" style="background-image: url('https://www.designnews.com/sites/default/files/103601_947901.jpg');">
+              <div style="height: 300px;"></div>
     </header>
 
     <!-- Content section -->
     <section class="py-5">
       <div class="container">
-        <h1>Section Heading</h1>
-        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, suscipit, rerum quos facilis repellat architecto commodi officia atque nemo facere eum non illo voluptatem quae delectus odit vel itaque amet.</p>
+        <h1>What is Flux Reconstructor</h1>
+        <p class="lead">It is an online tool for performing simple Computational Fluid Dynamics calculations.</p>
+        <p>It's goal is to "catch" flow physics with a low cost - you don't need any heavy software on your computer. Everything will happen here.</p>
+          <p>You will need to perform 3 steps: model, mesh and calculate. After that you will get results file.</p>
+          <p>This tool is based on PyFR framework:</p>
+          <p>Go to official PyFR page to check how you can use it: <a href="http://pyfr.org">http://pyfr.org</a></p>
+          <p>And to VincentLab git repository if you want to contribute or just check out the code: <a href="https://github.com/vincentlab/PyFR">https://github.com/vincentlab/PyFR</a></p>
       </div>
     </section>
 
     <!-- Image Section - set the background image for the header in the line below -->
-    <section class="py-5 bg-image-full" style="background-image: url('https://unsplash.it/1900/1080?image=1081');">
+    <section class="py-5 bg-image-full" style="background-image: url('https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/21c557d9281ee2ec1faf42598901ba3b/large.JPG');">
+      <!-- Put anything you want here! There is just a spacer below for demo purposes! -->
+      <div style="height: 600px;"></div>
+    </section>
+
+    <!-- Content section -->
+    <section class="py-5">
+      <div class="container">
+        <h1>Model</h1>
+        <p class="lead">At first geometrical model of immersed body will be prepared</p>
+          <p>If you want to prepare it here.. sorry, you will need to wait for next version of Flux Reconstructor. For now you can use: <a href="https://openjscad.org">OpenJSCAD</a> It will be integrated in the next version. Please upload your geometry file or go to next step if you already have mesh prepared</p>
+          <form action = "http://localhost:5000/upload_stl" method = "POST" enctype = "multipart/form-data">
+             <label class="btn btn-primary" for="my-file-selector">
+                <input id="my-file-selector" type="file" style="display:none;">
+                Choose STL
+             </label>
+              <label class="btn btn-primary" for="my-submit">
+                <input id="my-submit" class="btn btn-primary" type = "submit" value="Upload" style="display:none;"/>
+                  Upload
+              </label>
+          </form>
+      </div>
+    </section>
+
+        <!-- Image Section - set the background image for the header in the line below -->
+    <section class="py-5 bg-image-full" style="background-image: url('http://help.autodesk.com/cloudhelp/2016/ENU/SimCFD-UsersGuide/images/GUID-314859D0-E380-4A08-B9D7-1F76A96CD35D.png');">
       <!-- Put anything you want here! There is just a spacer below for demo purposes! -->
       <div style="height: 200px;"></div>
     </section>
@@ -71,9 +100,79 @@
     <!-- Content section -->
     <section class="py-5">
       <div class="container">
-        <h1>Section Heading</h1>
-        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, suscipit, rerum quos facilis repellat architecto commodi officia atque nemo facere eum non illo voluptatem quae delectus odit vel itaque amet.</p>
+        <h1>Mesh</h1>
+        <p class="lead">Mesh for uploaded model</p>
+          <p>Mesh will be prepared with the help of Pygmsh library: <a href="https://github.com/nschloe/pygmsh">https://github.com/nschloe/pygmsh</a> You can also upload ready .msh file if you already have it</p>
+              <form action = "http://localhost:5000/upload_msh" method = "POST" enctype = "multipart/form-data">
+                 <label class="btn btn-primary" for="mesh-file-selector">
+                    <input id="mesh-file-selector" type="file" style="display:none;">
+                    Choose .msh
+                 </label>
+                  <label class="btn btn-primary" for="mesh-submit">
+                    <input id="mesh-submit" class="btn btn-primary" type = "submit" value="Upload" style="display:none;"/>
+                      Upload
+                  </label>
+              </form>
+      </div>
+    </section>
+
+            <!-- Image Section - set the background image for the header in the line below -->
+    <section class="py-5 bg-image-full" style="background-image: url('https://www.caeses.com/wp-content/uploads/2014/10/shipflow_streamlines_cfd-670x300.png');">
+      <!-- Put anything you want here! There is just a spacer below for demo purposes! -->
+      <div style="height: 200px;"></div>
+    </section>
+
+    <!-- Content section -->
+    <section class="py-5">
+      <div class="container">
+        <h1>Calculation</h1>
+        <p class="lead">Calculate Navier-Stokes equations using FR</p>
+          <p>Flux Reconstruction method will now be used. Navier Stokes equations will be solved with a use of high order numerical method. Calculations will use CPU OpenMp. GPU CUDA will option will also be introduced in next version.
+              </p><p>Last step will require to set flow initial and boundary conditions:</p>
+              <form action = "http://localhost:5000/config" method = "POST" enctype = "multipart/form-data">
+                  <div class="form-group">
+                      <label for="gamma">gamma</label>
+                      <input type = "text" name="gamma" class="form-control" id="gamma" aria-describedby="gammaHelp" placeholder="Enter gamma"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="mu">mu</label>
+                      <input type = "text" name="mu" class="form-control" id="mu" aria-describedby="muHelp" placeholder="Enter mu"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="Pr">Pr</label>
+                      <input type = "text" name="Pr" class="form-control" id="Pr" aria-describedby="PrHelp" placeholder="Enter Pr"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="cp">cp</label>
+                      <input type = "text" name="cp" class="form-control" id="cp" aria-describedby="cpHelp" placeholder="Enter cp"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="Uw">Uw</label>
+                      <input type = "text" name="Uw" class="form-control" id="Uw" aria-describedby="UwHelp" placeholder="Enter Uw"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="H">H</label>
+                      <input type = "text" name="H" class="form-control" id="H" aria-describedby="HHelp" placeholder="Enter H"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="Pc">Pc</label>
+                      <input type = "text" name="Pc" class="form-control" id="Pc" aria-describedby="PcHelp" placeholder="Enter Pc"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="Tw">Tw</label>
+                      <input type = "text" name="Tw" class="form-control" id="Tw" aria-describedby="TwHelp" placeholder="Enter Tw"/>
+                  </div>
+                  <label class="btn btn-primary" for="ini-submit">
+                    <input id="ini-submit" class="btn btn-primary" type = "submit" value="Upload" style="display:none;"/>
+                      Initialize
+                  </label>
+              </form>
+             <form action = "http://localhost:5000/run" method = "POST" enctype = "multipart/form-data">
+                  <label class="btn btn-primary" for="run-submit">
+                    <input id="run-submit" class="btn btn-primary" type = "submit" value="Upload" style="display:none;"/>
+                      Run
+                  </label>
+              </form>
       </div>
     </section>
 
@@ -86,8 +185,8 @@
     </footer>
 
     <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
 
   </body>
 
