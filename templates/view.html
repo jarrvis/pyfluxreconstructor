@@ -77,8 +77,9 @@
       <div class="container">
         <h1>Model</h1>
         <p class="lead">At first geometrical model of immersed body will be prepared</p>
-          <p>If you want to prepare it here.. sorry, you will need to wait for next version of Flux Reconstructor. For now you can use: <a href="https://openjscad.org">OpenJSCAD</a> It will be integrated in the next version. Please upload your geometry file or go to next step if you already have mesh prepared</p>
-          <form action = "http://localhost:5000/upload_stl" method = "POST" enctype = "multipart/form-data">
+          <p>If you want to prepare it here.. sorry, you will need to wait for next version of Flux Reconstructor. For now you can use: <a href="https://openjscad.org">OpenJSCAD</a>
+              It will be integrated in the next version. Please upload your geometry file or go to next step if you already have mesh prepared or want to start directly from mesh</p>
+          <form action = "/upload_stl" method = "POST" enctype = "multipart/form-data">
              <label class="btn btn-primary" for="my-file-selector">
                 <input id="my-file-selector" type="file" style="display:none;">
                 Choose STL
@@ -92,7 +93,7 @@
     </section>
 
         <!-- Image Section - set the background image for the header in the line below -->
-    <section class="py-5 bg-image-full" style="background-image: url('http://help.autodesk.com/cloudhelp/2016/ENU/SimCFD-UsersGuide/images/GUID-314859D0-E380-4A08-B9D7-1F76A96CD35D.png');">
+    <section class="py-5 bg-image-full" style="background-image: url('');">
       <!-- Put anything you want here! There is just a spacer below for demo purposes! -->
       <div style="height: 200px;"></div>
     </section>
@@ -102,17 +103,25 @@
       <div class="container">
         <h1>Mesh</h1>
         <p class="lead">Mesh for uploaded model</p>
-          <p>Mesh will be prepared with the help of Pygmsh library: <a href="https://github.com/nschloe/pygmsh">https://github.com/nschloe/pygmsh</a> You can also upload ready .msh file if you already have it</p>
-              <form action = "http://localhost:5000/upload_msh" method = "POST" enctype = "multipart/form-data">
-                 <label class="btn btn-primary" for="mesh-file-selector">
-                    <input id="mesh-file-selector" type="file" style="display:none;">
-                    Choose .msh
-                 </label>
-                  <label class="btn btn-primary" for="mesh-submit">
-                    <input id="mesh-submit" class="btn btn-primary" type = "submit" value="Upload" style="display:none;"/>
-                      Upload
+          <p>Mesh can be prepared with the help of Pygmsh library: <a href="https://github.com/nschloe/pygmsh">https://github.com/nschloe/pygmsh</a>
+              You can use Pygmsh script to create your .msh file. You can download it for a review. Please upload final version here when you're ready.</p>
+          <p>You can also upload ready .msh file if you already have it</p>
+          <p>UPloaded file will be converted to .pyfrm which is PyFR acceptable mesh file format and used for calculations</p>
+          <div class="form-group">
+              <form action = "/pygmsh" method = "POST" id="pygmsh" enctype = "multipart/form-data">
+                  <label class="btn btn-primary" for="mesh-gen">
+                    <input id="mesh-gen" class="btn btn-primary" type = "submit" value="Generate" style="display:none;"/>
+                      Generate
                   </label>
               </form>
+              <label for="comment">Pygmsh script goes here:</label>
+              <textarea class="form-control" rows="15" id="comment" name="PyGmsh" form="pygmsh"></textarea>
+          </div>
+      <form action = "/upload_msh" method = "POST"
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file" />
+         <input class="btn btn-primary" type = "submit"/>
+      </form>
       </div>
     </section>
 
@@ -123,63 +132,108 @@
     </section>
 
     <!-- Content section -->
-    <section class="py-5">
+    <section id="calc" class="py-5">
       <div class="container">
         <h1>Calculation</h1>
         <p class="lead">Calculate Navier-Stokes equations using FR</p>
           <p>Flux Reconstruction method will now be used. Navier Stokes equations will be solved with a use of high order numerical method. Calculations will use CPU OpenMp. GPU CUDA will option will also be introduced in next version.
               </p><p>Last step will require to set flow initial and boundary conditions:</p>
-              <form action = "http://localhost:5000/config" method = "POST" enctype = "multipart/form-data">
-                  <div class="form-group">
-                      <label for="gamma">gamma</label>
-                      <input type = "text" name="gamma" class="form-control" id="gamma" aria-describedby="gammaHelp" placeholder="Enter gamma"/>
+                <br/>
+                <div class="row">
+                    <p class="col-md-6">Constants</p>
+                    <p class="col-md-6">Parameterises space (x, y, [z]) dependent initial conditions</p>
+                </div>
+              <form action = "/config" method = "POST" enctype = "multipart/form-data">
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="gamma">gamma</label>
+                          <input type = "text" name="gamma" class="form-control" id="gamma" value="1.4" aria-describedby="gammaHelp" placeholder="Enter gamma"/>
+                      </div>
+                      <div class="form-group col-md-6">
+                          <label for="rho">rho</label>
+                          <input type = "text" name="rho" class="form-control" id="rho" value="4*(Pc*sqrt(Pr*(Pr*Uw*Uw+8*cp*Tw))*log((sqrt(Pr*(Pr*Uw*Uw+8*cp*Tw))+Pr*Uw)/(sqrt(Pr*(Pr*Uw*Uw+8*cp*Tw))-Pr*Uw))*gamma)/(Pr*Uw*(Pr*Uw*Uw+8*cp*Tw)*(gamma-1))" aria-describedby="rhoHelp" placeholder="Enter rho"/>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label for="mu">mu</label>
-                      <input type = "text" name="mu" class="form-control" id="mu" aria-describedby="muHelp" placeholder="Enter mu"/>
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="mu">mu</label>
+                          <input type = "text" name="mu" class="form-control" id="mu" value="0.417" aria-describedby="muHelp" placeholder="Enter mu"/>
+                      </div>
+                      <div class="form-group col-md-6">
+                          <label for="u">u</label>
+                          <input type = "text" name="u" class="form-control" id="u" value="Uw" aria-describedby="uHelp" placeholder="Enter u"/>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label for="Pr">Pr</label>
-                      <input type = "text" name="Pr" class="form-control" id="Pr" aria-describedby="PrHelp" placeholder="Enter Pr"/>
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="Pr">Pr</label>
+                          <input type = "text" name="Pr" class="form-control" id="Pr" value="0.72" aria-describedby="PrHelp" placeholder="Enter Pr"/>
+                      </div>
+                      <div class="form-group col-md-6">
+                          <label for="v">v</label>
+                          <input type = "text" name="v" class="form-control" id="v" value="0.0" aria-describedby="vHelp" placeholder="Enter v"/>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label for="cp">cp</label>
-                      <input type = "text" name="cp" class="form-control" id="cp" aria-describedby="cpHelp" placeholder="Enter cp"/>
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="cp">cp</label>
+                          <input type = "text" name="cp" class="form-control" id="cp" value="1005.0" aria-describedby="cpHelp" placeholder="Enter cp"/>
+                      </div>
+                      <div class="form-group col-md-6">
+                          <label for="w">w</label>
+                          <input type = "text" name="w" class="form-control" id="w"  aria-describedby="wHelp" placeholder="Enter w"/>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label for="Uw">Uw</label>
-                      <input type = "text" name="Uw" class="form-control" id="Uw" aria-describedby="UwHelp" placeholder="Enter Uw"/>
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="Uw">Uw</label>
+                          <input type = "text" name="Uw" class="form-control" id="Uw" value="70" aria-describedby="UwHelp" placeholder="Enter Uw"/>
+                      </div>
+                      <div class="form-group col-md-6">
+                          <label for="p">p</label>
+                          <input type = "text" name="p" class="form-control" id="p" value="Pc" aria-describedby="pHelp" placeholder="Enter p"/>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label for="H">H</label>
-                      <input type = "text" name="H" class="form-control" id="H" aria-describedby="HHelp" placeholder="Enter H"/>
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="H">H</label>
+                          <input type = "text" name="H" class="form-control" id="H" value="1.0" aria-describedby="HHelp" placeholder="Enter H"/>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label for="Pc">Pc</label>
-                      <input type = "text" name="Pc" class="form-control" id="Pc" aria-describedby="PcHelp" placeholder="Enter Pc"/>
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="Pc">Pc</label>
+                          <input type = "text" name="Pc" class="form-control" id="Pc" value="100000.0" aria-describedby="PcHelp" placeholder="Enter Pc"/>
+                      </div>
                   </div>
-                  <div class="form-group">
-                      <label for="Tw">Tw</label>
-                      <input type = "text" name="Tw" class="form-control" id="Tw" aria-describedby="TwHelp" placeholder="Enter Tw"/>
+                  <div class="form-row">
+                      <div class="form-group col-md-6">
+                          <label for="Tw">Tw</label>
+                          <input type = "text" name="Tw" class="form-control" id="Tw" value="300.0" aria-describedby="TwHelp" placeholder="Enter Tw"/>
+                      </div>
                   </div>
                   <label class="btn btn-primary" for="ini-submit">
                     <input id="ini-submit" class="btn btn-primary" type = "submit" value="Upload" style="display:none;"/>
                       Initialize
                   </label>
               </form>
+          {% if pyfrm != None %}
              <form action = "http://localhost:5000/run" method = "POST" enctype = "multipart/form-data">
+                 <input type="text" name="filename" placeholder="Your mesh filename without extension"/>
                   <label class="btn btn-primary" for="run-submit">
                     <input id="run-submit" class="btn btn-primary" type = "submit" value="Upload" style="display:none;"/>
                       Run
                   </label>
               </form>
+            <p>Please keep in mind that hitting "run" will start FR calculations. This process can take a while. 5 minutes for academic usecases... </p>
+          {% endif %}
       </div>
     </section>
 
     <!-- Footer -->
     <footer class="py-5 bg-dark">
       <div class="container">
-        <p class="m-0 text-center text-white">Copyright &copy; Your Website 2017</p>
+        <p class="m-0 text-center text-white">Copyright &copy; Flux Reconstructor 2018</p>
       </div>
       <!-- /.container -->
     </footer>

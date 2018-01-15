@@ -1,11 +1,17 @@
+import pygmsh
+
 from pyfr_wrapper import msh2pyfrm
 from pyfr_wrapper import pyfr_run
 from pyfr_wrapper import pyfr_export
 import configparser
-from flask import Flask, render_template, request
+from flask import Flask, render_template, redirect, request, send_file, url_for
 from model import Average
 from werkzeug import secure_filename
 import os
+import meshio
+import numpy as np
+import fileinput
+import sys
 
 # Application object
 app = Flask(__name__)
@@ -32,13 +38,24 @@ def index():
     form = Average(request.form)
     return render_template("view.html", form=form, pyfrm=None)
 
+@app.route('/pygmsh', methods=['POST'])
+def pyGmsh():
+    PyGmsh = request.form.get("PyGmsh")
+    geom = pygmsh.built_in.Geometry()
+    exec(PyGmsh)
+
+    points, cells, point_data, cell_data, field_data = pygmsh.generate_mesh(geom)
+    #points, cells, _, _, _ = pygmsh.generate_mesh(geom)
+    meshio.write('mesh.vtu', points, cells, cell_data=cell_data)
+    return send_file("mesh.vtu")
+
 @app.route('/upload_msh', methods=['POST'])
 def upload_msh():
     # Save uploaded file on server if it exists and is valid
     form = Average(request.form)
     pyfrm = None
     if request.files:
-        file = request.files[form.filename.name]
+        file = request.files['file']
         if file and allowed_file(file.filename):
             # Make a valid version of filename for any file system
             filename = secure_filename(file.filename)
@@ -47,36 +64,35 @@ def upload_msh():
 
             pyfrm = msh2pyfrm(filename)
 
-    return render_template("view.html", form=form, pyfrm=pyfrm)
+    return redirect(url_for('index') + '#calc')
 
 @app.route('/config', methods=['POST'])
 def upload_config():
-    config= configparser.ConfigParser()
-    config.read(r'config/config.ini')
 
-    config['constants'] = {"gamma": request.form.get("gamma"),
-                           "mu":request.form.get("mu"),
-                           "Pr": request.form.get("Pr"),
-                           "cp": request.form.get("cp"),
-                           "Uw": request.form.get("Uw"),
-                           "H": request.form.get("H"),
-                           "Pc": request.form.get("Pc"),
-                           "Tw": request.form.get("Tw")}
+    keys = ["gamma", "mu", "Pr", "cp", "Uw", "H", "Pc", "Tw", "rho", "u", "v", "w", "p" ]
+    for line in fileinput.input("config/config.ini", inplace=1):
+        if line.startswith("["):
+            if "constants" in line or "soln-ics" in line:
+                check = True
+            else:
+                check = False
+        if check is True:
+            for i,key in enumerate(keys):
+                if line.startswith(key + " = "):
+                    line = key + " = " + request.form.get(key) + "\n"
+        sys.stdout.write(line)
 
-    with open(r'config/config.ini', 'w') as configfile:
-        config.write(configfile)
 
-    return render_template("view.html")
+    return render_template("view.html", pyfrm=True)
 
 @app.route('/run', methods=['POST'])
 def run():
-    form = Average(request.form)
     filename = request.form.get("filename")
     if os.path.isfile(os.path.join('mesh', filename +".pyfrm")):
         pyfr_run(filename)
         pyfr_export(filename)
 
-    return render_template("view.html", form=form)
+    return send_file(filename + "-040.vtu")
 
 
 if __name__ == '__main__':
